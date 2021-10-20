@@ -1,18 +1,15 @@
 package stepDefinitions;
 
-import dataProvider.ConfigFileReader;
+import io.cucumber.java.After;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import managers.FileReaderManager;
 import managers.PageObjectManager;
+import managers.WebDriverManager;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import pageObjects.Common;
 import pageObjects.HomePage;
 import pageObjects.TodayDeals;
-
-import java.util.concurrent.TimeUnit;
 
 public class Steps {
     WebDriver driver;
@@ -20,15 +17,12 @@ public class Steps {
     TodayDeals todayDeals;
     Common common;
     PageObjectManager pageObjectManager;
-    ConfigFileReader configFileReader;
+    WebDriverManager webDriverManager;
 
     @Given("^user is navigating to Amazon$")
     public void navigateToHomePage() throws InterruptedException {
-        configFileReader = new ConfigFileReader();
-        System.setProperty("webdriver.chrome.driver", FileReaderManager.getInstance().getConfigReader().getDriverPath());
-        driver = new ChromeDriver();
-        driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        webDriverManager = new WebDriverManager();
+        driver = webDriverManager.getDriver();
         pageObjectManager = new PageObjectManager(driver);
         common = pageObjectManager.getCommon();
         common.navigateToHomePage();
@@ -45,6 +39,10 @@ public class Steps {
         todayDeals = pageObjectManager.getTodayDeals();
         todayDeals.clickOnTopBrands();
         Thread.sleep(3000);
-        driver.quit();
+    }
+
+    @After
+    public void AfterSteps() {
+        webDriverManager.closeDriver();
     }
 }
